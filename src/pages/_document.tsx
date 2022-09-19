@@ -21,6 +21,8 @@ export default function Document() {
           id="stitches"
           dangerouslySetInnerHTML={{ __html: getCssText() }}
         />
+
+        <link rel="icon" type="image/svg" href="/favicon.ico" />
       </Head>
       <body>
         <Main />
