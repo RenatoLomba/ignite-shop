@@ -1,18 +1,17 @@
+import { useKeenSlider } from 'keen-slider/react'
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
+
+import 'keen-slider/keen-slider.min.css'
 
 import { styled } from '../styles'
 import { shirts } from '../utils/shirts'
 
 const Container = styled('main', {
   display: 'flex',
-  gap: '3rem',
   width: '100%',
-  maxWidth: 'calc(100vw - ((100vw - 1180px) / 2))',
-  marginLeft: 'auto',
-  minHeight: 656,
 })
 
 const Product = styled('a', {
@@ -66,15 +65,22 @@ const Product = styled('a', {
 })
 
 const Home: NextPage = () => {
+  const [sliderRef] = useKeenSlider({
+    slides: {
+      perView: 3,
+      spacing: 48,
+    },
+  })
+
   return (
     <>
       <Head>
         <title>Ignite Shop | Home</title>
       </Head>
-      <Container>
-        {shirts.slice(0, 2).map((shirt) => (
+      <Container ref={sliderRef} className="keen-slider">
+        {shirts.map((shirt) => (
           <Link key={shirt.id} href={`/product/${shirt.id}`} passHref>
-            <Product>
+            <Product className="keen-slider__slide">
               <Image
                 src={shirt.coverUrl}
                 alt={shirt.name}
