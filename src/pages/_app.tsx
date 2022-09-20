@@ -12,6 +12,7 @@ const Container = styled('div', {
   alignItems: 'flex-start',
   minHeight: '100vh',
   justifyContent: 'center',
+  overflow: 'hidden',
 })
 
 const Header = styled('header', {
