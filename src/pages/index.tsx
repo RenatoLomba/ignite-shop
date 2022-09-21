@@ -1,13 +1,15 @@
 import { useKeenSlider } from 'keen-slider/react'
-import type { NextPage } from 'next'
+import type { GetStaticProps, NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
 
+import { useQuery, QueryClient, dehydrate } from '@tanstack/react-query'
+
 import 'keen-slider/keen-slider.min.css'
 
 import { styled } from '../styles'
-import { shirts } from '../utils/shirts'
+import { stripe } from '../utils/stripe'
 
 const Container = styled('main', {
   display: 'flex',
@@ -64,6 +66,39 @@ const Product = styled('a', {
   },
 })
 
+const getProducts = async () => {
+  const products = await stripe.products.list({
+    expand: ['data.default_price'],
+  })
+
+  const productsWithPrice = products.data.map((product) => {
+    return {
+      id: product.id,
+      name: product.name,
+      coverUrl: product.images[0],
+      price:
+        typeof product.default_price !== 'string'
+          ? product.default_price!.unit_amount! / 100
+          : 0,
+    }
+  })
+
+  return productsWithPrice
+}
+
+const getStaticProps: GetStaticProps = async () => {
+  const queryClient = new QueryClient()
+
+  await queryClient.prefetchQuery(['products'], getProducts)
+
+  return {
+    props: {
+      dehydratedState: dehydrate(queryClient),
+    },
+    revalidate: 5,
+  }
+}
+
 const Home: NextPage = () => {
   const [sliderRef] = useKeenSlider({
     slides: {
@@ -72,29 +107,33 @@ const Home: NextPage = () => {
     },
   })
 
+  const { data: products } = useQuery(['products'], getProducts, {
+    staleTime: 1000 * 30,
+  })
+
   return (
     <>
       <Head>
         <title>Ignite Shop | Home</title>
       </Head>
       <Container ref={sliderRef} className="keen-slider">
-        {shirts.map((shirt) => (
-          <Link key={shirt.id} href={`/product/${shirt.id}`} passHref>
+        {products?.map((product) => (
+          <Link key={product.id} href={`/product/${product.id}`} passHref>
             <Product className="keen-slider__slide">
               <Image
-                src={shirt.coverUrl}
-                alt={shirt.name}
+                src={product.coverUrl}
+                alt={product.name}
                 width={520}
                 height={480}
               />
 
               <footer>
-                <strong>{shirt.name}</strong>
+                <strong>{product.name}</strong>
                 <span>
                   {new Intl.NumberFormat('pt-BR', {
                     currency: 'BRL',
                     style: 'currency',
-                  }).format(shirt.price)}
+                  }).format(product.price)}
                 </span>
               </footer>
             </Product>
@@ -105,4 +144,5 @@ const Home: NextPage = () => {
   )
 }
 
+export { getStaticProps }
 export default Home

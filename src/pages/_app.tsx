@@ -1,5 +1,13 @@
 import type { AppProps } from 'next/app'
 import Image from 'next/image'
+import { useState } from 'react'
+
+import {
+  Hydrate,
+  QueryClient,
+  QueryClientProvider,
+  DehydratedState,
+} from '@tanstack/react-query'
 
 import { styled } from '../styles'
 import { globalStyles } from '../styles/global'
@@ -22,14 +30,23 @@ const Header = styled('header', {
   margin: '0 auto',
 })
 
-export default function App({ Component, pageProps }: AppProps) {
-  return (
-    <Container>
-      <Header>
-        <Image src="/logo.svg" alt="Logotipo" width={130} height={52} />
-      </Header>
+export default function MyApp({
+  Component,
+  pageProps,
+}: AppProps<{ dehydratedState: DehydratedState }>) {
+  const [client] = useState(() => new QueryClient())
 
-      <Component {...pageProps} />
-    </Container>
+  return (
+    <QueryClientProvider client={client}>
+      <Hydrate state={pageProps.dehydratedState}>
+        <Container>
+          <Header>
+            <Image src="/logo.svg" alt="Logotipo" width={130} height={52} />
+          </Header>
+
+          <Component {...pageProps} />
+        </Container>
+      </Hydrate>
+    </QueryClientProvider>
   )
 }
