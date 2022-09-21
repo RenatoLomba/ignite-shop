@@ -108,7 +108,7 @@ const Home: NextPage = () => {
   })
 
   const { data: products } = useQuery(['products'], getProducts, {
-    staleTime: 1000 * 30,
+    staleTime: 1000 * 60 * 2, // 2 minutes
   })
 
   return (

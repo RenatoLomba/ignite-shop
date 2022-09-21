@@ -1,5 +1,6 @@
 import type { AppProps } from 'next/app'
 import Image from 'next/image'
+import Link from 'next/link'
 import { useState } from 'react'
 
 import {
@@ -8,6 +9,7 @@ import {
   QueryClientProvider,
   DehydratedState,
 } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 import { styled } from '../styles'
 import { globalStyles } from '../styles/global'
@@ -15,6 +17,9 @@ import { globalStyles } from '../styles/global'
 globalStyles()
 
 const Container = styled('div', {
+  '@media screen and (max-width: 1180px)': {
+    padding: '0 2rem',
+  },
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'flex-start',
@@ -41,12 +46,18 @@ export default function MyApp({
       <Hydrate state={pageProps.dehydratedState}>
         <Container>
           <Header>
-            <Image src="/logo.svg" alt="Logotipo" width={130} height={52} />
+            <Link href="/" passHref>
+              <a>
+                <Image src="/logo.svg" alt="Logotipo" width={130} height={52} />
+              </a>
+            </Link>
           </Header>
 
           <Component {...pageProps} />
         </Container>
       </Hydrate>
+
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   )
 }
