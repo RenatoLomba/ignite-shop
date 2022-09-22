@@ -1,9 +1,16 @@
+import axios from 'axios'
 import { GetStaticPaths, GetStaticProps, NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
+import Stripe from 'stripe'
 
-import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query'
+import {
+  dehydrate,
+  QueryClient,
+  useMutation,
+  useQuery,
+} from '@tanstack/react-query'
 
 import { styled } from '../../styles'
 import { stripe } from '../../utils/stripe'
@@ -91,6 +98,10 @@ const PurchaseButton = styled('button', {
     outline: '2px solid',
     outlineColor: '$green300',
   },
+
+  '&:disabled': {
+    opacity: 0.6,
+  },
 })
 
 const getProduct = async (productId: string) => {
@@ -98,12 +109,12 @@ const getProduct = async (productId: string) => {
     expand: ['default_price'],
   })
 
+  const price = product.default_price as Stripe.Price
+
   return {
     name: product.name,
-    price:
-      typeof product.default_price !== 'string'
-        ? product.default_price!.unit_amount! / 100
-        : 0,
+    price: price.unit_amount! / 100,
+    priceId: price.id,
     description: product.description,
     coverUrl: product.images[0],
   }
@@ -158,6 +169,24 @@ const ProductPage: NextPage = () => {
     },
   )
 
+  const { isLoading: isCreatingCheckout, mutateAsync } = useMutation(
+    async (priceId: string) => {
+      const { data } = await axios.post<{ checkoutUrl: string }>(
+        '/api/checkout',
+        {
+          priceId,
+        },
+      )
+
+      return data
+    },
+    {
+      onSuccess: (data) => {
+        window.location.href = data.checkoutUrl
+      },
+    },
+  )
+
   if (!product) {
     return <div>No product</div>
   }
@@ -189,7 +218,12 @@ const ProductPage: NextPage = () => {
 
           <p>{product.description}</p>
 
-          <PurchaseButton>Comprar agora</PurchaseButton>
+          <PurchaseButton
+            disabled={isCreatingCheckout}
+            onClick={() => mutateAsync(product.priceId)}
+          >
+            {isCreatingCheckout ? 'Carregando compra...' : 'Comprar agora'}
+          </PurchaseButton>
         </ProductDetails>
       </Container>
     </>
