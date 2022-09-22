@@ -118,7 +118,12 @@ const Home: NextPage = () => {
       </Head>
       <Container ref={sliderRef} className="keen-slider">
         {products?.map((product) => (
-          <Link key={product.id} href={`/product/${product.id}`} passHref>
+          <Link
+            key={product.id}
+            href={`/product/${product.id}`}
+            passHref
+            prefetch={false}
+          >
             <Product className="keen-slider__slide">
               <Image
                 src={product.coverUrl}
