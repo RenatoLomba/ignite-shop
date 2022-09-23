@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import { stripe } from '../../utils/stripe'
+import { stripe } from '../../../utils/stripe'
 
 const getUrl = () => process.env.VERCEL_URL || 'http://localhost:3000'
 
@@ -29,7 +29,7 @@ export default async function handler(
       },
     ],
     cancel_url: req.headers.referer || req.headers.host!, // who sent the request
-    success_url: getUrl() + '/success-purchase',
+    success_url: `${getUrl()}/success-purchase?session_id={CHECKOUT_SESSION_ID}`,
   })
 
   return res.status(201).json({ checkoutUrl: checkoutSession.url })
