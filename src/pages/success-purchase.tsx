@@ -74,7 +74,9 @@ const SuccessPurchasePage: NextPage<{ sessionId: string }> = ({
   return (
     <>
       <Head>
-        <title>Ignite Shop | Sucesso na compra</title>
+        <title>Compra efetuada | Ignite Shop</title>
+
+        <meta name="robots" content="noindex" />
       </Head>
       <Container>
         {isLoading ? (

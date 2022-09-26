@@ -114,7 +114,7 @@ const Home: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Ignite Shop | Home</title>
+        <title>Home | Ignite Shop</title>
       </Head>
       <Container ref={sliderRef} className="keen-slider">
         {products?.map((product) => (

@@ -194,7 +194,7 @@ const ProductPage: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Ignite Shop | {product.name}</title>
+        <title>{product.name} | Ignite Shop</title>
       </Head>
       <Container>
         <ImageContainer>
