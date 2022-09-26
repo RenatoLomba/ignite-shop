@@ -113,8 +113,6 @@ const SuccessPurchasePage: NextPage<{ sessionId: string }> = ({
 const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { session_id: sessionId } = ctx.query
 
-  console.log(sessionId)
-
   if (!sessionId) {
     return {
       redirect: {
