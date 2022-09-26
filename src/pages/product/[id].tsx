@@ -94,11 +94,6 @@ const PurchaseButton = styled('button', {
     filter: 'brightness(0.8)',
   },
 
-  '&:focus': {
-    outline: '2px solid',
-    outlineColor: '$green300',
-  },
-
   '&:disabled': {
     opacity: 0.6,
   },

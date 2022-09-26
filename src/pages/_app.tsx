@@ -1,6 +1,7 @@
 import type { AppProps } from 'next/app'
 import Image from 'next/image'
 import Link from 'next/link'
+import { Bag } from 'phosphor-react'
 import { useState } from 'react'
 
 import {
@@ -33,6 +34,24 @@ const Header = styled('header', {
   width: '100%',
   maxWidth: 1180,
   margin: '0 auto',
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+})
+
+const BagButton = styled('button', {
+  background: '$gray800',
+  color: '$gray500',
+  borderRadius: 6,
+  border: 'none',
+  lineHeight: 0,
+  padding: '0.75rem',
+  transition: 'background 0.2s ease, color 0.2s ease',
+
+  '&:hover': {
+    background: '$green500',
+    color: '$white',
+  },
 })
 
 export default function MyApp({
@@ -51,6 +70,10 @@ export default function MyApp({
                 <Image src="/logo.svg" alt="Logotipo" width={130} height={52} />
               </a>
             </Link>
+
+            <BagButton>
+              <Bag size={24} />
+            </BagButton>
           </Header>
 
           <Component {...pageProps} />

@@ -7,6 +7,11 @@ export const globalStyles = globalCss({
     boxSizing: 'border-box',
   },
 
+  'button:focus': {
+    outline: '2px solid',
+    outlineColor: '$green300',
+  },
+
   body: {
     '-webkit-font-smoothing': 'antialiased',
     backgroundColor: '$gray900',

@@ -3,6 +3,7 @@ import type { GetStaticProps, NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
+import { Bag } from 'phosphor-react'
 
 import { useQuery, QueryClient, dehydrate } from '@tanstack/react-query'
 
@@ -49,12 +50,14 @@ const Product = styled('a', {
     strong: {
       color: '$gray100',
       fontSize: '$lg',
+      display: 'block',
     },
 
     span: {
       color: '$green300',
       fontWeight: 'bold',
       fontSize: '$xl',
+      display: 'block',
     },
   },
 
@@ -63,6 +66,20 @@ const Product = styled('a', {
       transform: 'translateY(0)',
       opacity: 1,
     },
+  },
+})
+
+const BagButton = styled('button', {
+  background: '$green500',
+  color: '$white',
+  borderRadius: 6,
+  border: 'none',
+  lineHeight: 0,
+  padding: '0.75rem',
+  transition: 'filter 0.2s ease',
+
+  '&:hover': {
+    filter: 'brightness(0.90)',
   },
 })
 
@@ -133,13 +150,21 @@ const Home: NextPage = () => {
               />
 
               <footer>
-                <strong>{product.name}</strong>
-                <span>
-                  {new Intl.NumberFormat('pt-BR', {
-                    currency: 'BRL',
-                    style: 'currency',
-                  }).format(product.price)}
-                </span>
+                <div>
+                  <strong>{product.name}</strong>
+                  <span>
+                    {new Intl.NumberFormat('pt-BR', {
+                      currency: 'BRL',
+                      style: 'currency',
+                    }).format(product.price)}
+                  </span>
+                </div>
+
+                <div>
+                  <BagButton>
+                    <Bag size={32} />
+                  </BagButton>
+                </div>
               </footer>
             </Product>
           </Link>
