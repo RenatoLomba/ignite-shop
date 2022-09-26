@@ -15,6 +15,7 @@
     "@tanstack/react-query-devtools": "^4.3.9",
     "axios": "^0.27.2",
     "child_process": "^1.0.2",
+    "immer": "^9.0.15",
     "keen-slider": "^6.8.2",
     "next": "12.3.0",
     "phosphor-react": "^1.4.1",

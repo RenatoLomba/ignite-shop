@@ -11,13 +11,14 @@ import 'keen-slider/keen-slider.min.css'
 
 import { styled } from '../styles'
 import { stripe } from '../utils/stripe'
+import { useShoppingCart } from './_app'
 
 const Container = styled('main', {
   display: 'flex',
   width: '100%',
 })
 
-const Product = styled('a', {
+const Product = styled('div', {
   background: 'linear-gradient(180deg, #1EA483 0%, #7465D4 100%)',
   borderRadius: 8,
   padding: '0.25rem',
@@ -59,6 +60,12 @@ const Product = styled('a', {
       fontSize: '$xl',
       display: 'block',
     },
+
+    a: {
+      '&:hover': {
+        textDecoration: 'underline',
+      },
+    },
   },
 
   '&:hover': {
@@ -97,6 +104,10 @@ const getProducts = async () => {
         typeof product.default_price !== 'string'
           ? product.default_price!.unit_amount! / 100
           : 0,
+      priceId:
+        typeof product.default_price !== 'string'
+          ? product.default_price!.id!
+          : '',
     }
   })
 
@@ -117,6 +128,8 @@ const getStaticProps: GetStaticProps = async () => {
 }
 
 const Home: NextPage = () => {
+  const { addItemToCart, items } = useShoppingCart()
+
   const [sliderRef] = useKeenSlider({
     slides: {
       perView: 3,
@@ -128,6 +141,8 @@ const Home: NextPage = () => {
     staleTime: 1000 * 60 * 2, // 2 minutes
   })
 
+  console.log(items)
+
   return (
     <>
       <Head>
@@ -135,39 +150,42 @@ const Home: NextPage = () => {
       </Head>
       <Container ref={sliderRef} className="keen-slider">
         {products?.map((product) => (
-          <Link
-            key={product.id}
-            href={`/product/${product.id}`}
-            passHref
-            prefetch={false}
-          >
-            <Product className="keen-slider__slide">
-              <Image
-                src={product.coverUrl}
-                alt={product.name}
-                width={520}
-                height={480}
-              />
+          <Product key={product.id} className="keen-slider__slide">
+            <Link href={`/product/${product.id}`} passHref prefetch={false}>
+              <a>
+                <Image
+                  src={product.coverUrl}
+                  alt={product.name}
+                  width={520}
+                  height={480}
+                />
+              </a>
+            </Link>
 
-              <footer>
-                <div>
-                  <strong>{product.name}</strong>
-                  <span>
-                    {new Intl.NumberFormat('pt-BR', {
-                      currency: 'BRL',
-                      style: 'currency',
-                    }).format(product.price)}
-                  </span>
-                </div>
+            <footer>
+              <div>
+                <Link href={`/product/${product.id}`} passHref prefetch={false}>
+                  <a>
+                    <strong>{product.name}</strong>
+                  </a>
+                </Link>
+                <span>
+                  {new Intl.NumberFormat('pt-BR', {
+                    currency: 'BRL',
+                    style: 'currency',
+                  }).format(product.price)}
+                </span>
+              </div>
 
-                <div>
-                  <BagButton>
-                    <Bag size={32} />
-                  </BagButton>
-                </div>
-              </footer>
-            </Product>
-          </Link>
+              <div>
+                <BagButton
+                  onClick={() => addItemToCart(product.id, product.priceId)}
+                >
+                  <Bag size={32} />
+                </BagButton>
+              </div>
+            </footer>
+          </Product>
         ))}
       </Container>
     </>
