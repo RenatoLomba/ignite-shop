@@ -5,12 +5,12 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Bag } from 'phosphor-react'
 
-import { useQuery, QueryClient, dehydrate } from '@tanstack/react-query'
+import { QueryClient, dehydrate } from '@tanstack/react-query'
 
 import 'keen-slider/keen-slider.min.css'
 
 import { styled } from '../styles'
-import { stripe } from '../utils/stripe'
+import { getProducts, useProducts } from '../utils/use-products'
 import { useShoppingCart } from './_app'
 
 const Container = styled('main', {
@@ -90,30 +90,6 @@ const BagButton = styled('button', {
   },
 })
 
-const getProducts = async () => {
-  const products = await stripe.products.list({
-    expand: ['data.default_price'],
-  })
-
-  const productsWithPrice = products.data.map((product) => {
-    return {
-      id: product.id,
-      name: product.name,
-      coverUrl: product.images[0],
-      price:
-        typeof product.default_price !== 'string'
-          ? product.default_price!.unit_amount! / 100
-          : 0,
-      priceId:
-        typeof product.default_price !== 'string'
-          ? product.default_price!.id!
-          : '',
-    }
-  })
-
-  return productsWithPrice
-}
-
 const getStaticProps: GetStaticProps = async () => {
   const queryClient = new QueryClient()
 
@@ -128,7 +104,7 @@ const getStaticProps: GetStaticProps = async () => {
 }
 
 const Home: NextPage = () => {
-  const { addItemToCart, items } = useShoppingCart()
+  const { addItemToCart } = useShoppingCart()
 
   const [sliderRef] = useKeenSlider({
     slides: {
@@ -137,11 +113,7 @@ const Home: NextPage = () => {
     },
   })
 
-  const { data: products } = useQuery(['products'], getProducts, {
-    staleTime: 1000 * 60 * 2, // 2 minutes
-  })
-
-  console.log(items)
+  const { data: products } = useProducts()
 
   return (
     <>

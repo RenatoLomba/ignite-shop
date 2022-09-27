@@ -1,8 +1,6 @@
 import produce from 'immer'
 import type { AppProps } from 'next/app'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Bag } from 'phosphor-react'
+import dynamic from 'next/dynamic'
 import {
   createContext,
   ReactNode,
@@ -19,8 +17,11 @@ import {
 } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
+import { Header } from '../components/header'
 import { styled } from '../styles'
 import { globalStyles } from '../styles/global'
+
+import 'react-modern-drawer/dist/index.css'
 
 globalStyles()
 
@@ -34,31 +35,6 @@ const Container = styled('div', {
   minHeight: '100vh',
   justifyContent: 'center',
   overflow: 'hidden',
-})
-
-const Header = styled('header', {
-  padding: '2rem 0',
-  width: '100%',
-  maxWidth: 1180,
-  margin: '0 auto',
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-})
-
-const BagButton = styled('button', {
-  background: '$gray800',
-  color: '$gray500',
-  borderRadius: 6,
-  border: 'none',
-  lineHeight: 0,
-  padding: '0.75rem',
-  transition: 'background 0.2s ease, color 0.2s ease',
-
-  '&:hover': {
-    background: '$green500',
-    color: '$white',
-  },
 })
 
 type ShoppingCartItem = {
@@ -197,6 +173,16 @@ function ShoppingCartProvider({ children }: { children: ReactNode }) {
 
 export const useShoppingCart = () => useContext(ShoppingCartContext)
 
+const ShoppingCartDrawer = dynamic(
+  () =>
+    import('../components/shopping-cart-drawer').then(
+      (module) => module.ShoppingCartDrawer,
+    ),
+  {
+    ssr: false,
+  },
+)
+
 export default function MyApp({
   Component,
   pageProps,
@@ -208,24 +194,11 @@ export default function MyApp({
       <Hydrate state={pageProps.dehydratedState}>
         <ShoppingCartProvider>
           <Container>
-            <Header>
-              <Link href="/" passHref>
-                <a>
-                  <Image
-                    src="/logo.svg"
-                    alt="Logotipo"
-                    width={130}
-                    height={52}
-                  />
-                </a>
-              </Link>
-
-              <BagButton>
-                <Bag size={24} />
-              </BagButton>
-            </Header>
+            <Header />
 
             <Component {...pageProps} />
+
+            <ShoppingCartDrawer />
           </Container>
         </ShoppingCartProvider>
       </Hydrate>
