@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Bag } from 'phosphor-react'
 
-import { useShoppingCart } from '../pages/_app'
+import { useShoppingCart } from '../contexts'
 import { styled } from '../styles'
 
 const Container = styled('header', {

@@ -5,7 +5,7 @@ import Drawer from 'react-modern-drawer'
 
 import { css } from '@stitches/react'
 
-import { useShoppingCart } from '../pages/_app'
+import { useShoppingCart } from '../contexts'
 import { styled } from '../styles'
 import { useProducts } from '../utils/use-products'
 

@@ -9,9 +9,9 @@ import { QueryClient, dehydrate } from '@tanstack/react-query'
 
 import 'keen-slider/keen-slider.min.css'
 
+import { useShoppingCart } from '../contexts'
 import { styled } from '../styles'
 import { getProducts, useProducts } from '../utils/use-products'
-import { useShoppingCart } from './_app'
 
 const Container = styled('main', {
   display: 'flex',
