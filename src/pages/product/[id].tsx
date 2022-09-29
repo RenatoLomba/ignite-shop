@@ -1,14 +1,16 @@
+import axios from 'axios'
 import { GetStaticPaths, GetStaticProps, NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import Stripe from 'stripe'
 
 import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query'
 
 import { useShoppingCart } from '../../contexts'
 import { styled } from '../../styles'
+import { getUrl } from '../../utils/get-url'
 import { stripe } from '../../utils/stripe'
+import { Product } from '../../utils/use-products'
 
 const Container = styled('main', {
   width: '100%',
@@ -45,7 +47,7 @@ const ImageContainer = styled('div', {
   },
 })
 
-const ProductDetails = styled('div', {
+const ProductDetailsContainer = styled('div', {
   display: 'flex',
   flexDirection: 'column',
 
@@ -94,21 +96,14 @@ const PurchaseButton = styled('button', {
   },
 })
 
+type ProductDetails = Product & { description?: string | null }
+
 const getProduct = async (productId: string) => {
-  const product = await stripe.products.retrieve(productId, {
-    expand: ['default_price'],
-  })
+  const { data } = await axios.get<ProductDetails>(
+    getUrl() + `/api/products/${productId}`,
+  )
 
-  const price = product.default_price as Stripe.Price
-
-  return {
-    id: product.id,
-    name: product.name,
-    price: price.unit_amount! / 100,
-    priceId: price.id,
-    description: product.description,
-    coverUrl: product.images[0],
-  }
+  return data
 }
 
 const getStaticProps: GetStaticProps = async (ctx) => {
@@ -181,7 +176,7 @@ const ProductPage: NextPage = () => {
           />
         </ImageContainer>
 
-        <ProductDetails>
+        <ProductDetailsContainer>
           <h1>{product.name}</h1>
 
           <span>
@@ -198,7 +193,7 @@ const ProductPage: NextPage = () => {
           >
             Comprar agora
           </PurchaseButton>
-        </ProductDetails>
+        </ProductDetailsContainer>
       </Container>
     </>
   )
