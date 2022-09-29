@@ -5,9 +5,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Bag } from 'phosphor-react'
 
-import { QueryClient, dehydrate } from '@tanstack/react-query'
-
 import 'keen-slider/keen-slider.min.css'
+
+import { dehydrate, QueryClient } from '@tanstack/react-query'
 
 import { useShoppingCart } from '../contexts'
 import { styled } from '../styles'
@@ -18,7 +18,7 @@ const Container = styled('main', {
   width: '100%',
 })
 
-const Product = styled('div', {
+const ProductContainer = styled('div', {
   background: 'linear-gradient(180deg, #1EA483 0%, #7465D4 100%)',
   borderRadius: 8,
   padding: '0.25rem',
@@ -122,7 +122,7 @@ const Home: NextPage = () => {
       </Head>
       <Container ref={sliderRef} className="keen-slider">
         {products?.map((product) => (
-          <Product key={product.id} className="keen-slider__slide">
+          <ProductContainer key={product.id} className="keen-slider__slide">
             <Link href={`/product/${product.id}`} passHref prefetch={false}>
               <a>
                 <Image
@@ -157,7 +157,7 @@ const Home: NextPage = () => {
                 </BagButton>
               </div>
             </footer>
-          </Product>
+          </ProductContainer>
         ))}
       </Container>
     </>

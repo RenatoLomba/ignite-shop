@@ -36,6 +36,11 @@ const Container = styled('main', {
   },
 })
 
+const ImagesList = styled('div', {
+  display: 'flex',
+  gap: '0.5rem',
+})
+
 const ImageContainer = styled('div', {
   background: 'linear-gradient(180deg, #1EA483 0%, #7465D4 100%)',
   width: 127,
@@ -55,8 +60,10 @@ const ImageContainer = styled('div', {
 type Session = {
   id: string
   customerName: string
-  productName: string
-  coverUrl: string
+  products: {
+    name: string
+    coverUrl: string
+  }[]
 }
 
 const SuccessPurchasePage: NextPage<{ sessionId: string }> = ({
@@ -87,19 +94,25 @@ const SuccessPurchasePage: NextPage<{ sessionId: string }> = ({
           <>
             <h1>Compra efetuada!</h1>
 
-            <ImageContainer>
-              <Image
-                src={checkoutSession.coverUrl}
-                alt={checkoutSession.productName}
-                width={115}
-                height={106}
-              />
-            </ImageContainer>
+            <ImagesList>
+              {checkoutSession.products.map((product) => (
+                <ImageContainer key={product.name}>
+                  <Image
+                    src={product.coverUrl}
+                    alt={product.name}
+                    width={115}
+                    height={106}
+                  />
+                </ImageContainer>
+              ))}
+            </ImagesList>
 
             <p>
               Uhuul <strong>{checkoutSession.customerName}</strong>, sua{' '}
-              <strong>{checkoutSession.productName}</strong> já está a caminho
-              da sua casa
+              <strong>{checkoutSession.products[0].name}</strong> e{' '}
+              {checkoutSession.products.length > 1 &&
+                `outras ${checkoutSession.products.length - 1}`}{' '}
+              já estão a caminho da sua casa
             </p>
 
             <Link href="/" passHref>

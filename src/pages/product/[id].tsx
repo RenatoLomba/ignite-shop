@@ -1,17 +1,12 @@
-import axios from 'axios'
 import { GetStaticPaths, GetStaticProps, NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import Stripe from 'stripe'
 
-import {
-  dehydrate,
-  QueryClient,
-  useMutation,
-  useQuery,
-} from '@tanstack/react-query'
+import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query'
 
+import { useShoppingCart } from '../../contexts'
 import { styled } from '../../styles'
 import { stripe } from '../../utils/stripe'
 
@@ -107,6 +102,7 @@ const getProduct = async (productId: string) => {
   const price = product.default_price as Stripe.Price
 
   return {
+    id: product.id,
     name: product.name,
     price: price.unit_amount! / 100,
     priceId: price.id,
@@ -151,6 +147,8 @@ const ProductPage: NextPage = () => {
   const { query } = useRouter()
   const { id: productId } = query
 
+  const { addItemToCart } = useShoppingCart()
+
   const { data: product } = useQuery(
     ['product', productId],
     async () => {
@@ -161,24 +159,6 @@ const ProductPage: NextPage = () => {
     {
       retry: true,
       staleTime: 1000 * 60 * 2, // 2 minutes
-    },
-  )
-
-  const { isLoading: isCreatingCheckout, mutateAsync } = useMutation(
-    async (priceId: string) => {
-      const { data } = await axios.post<{ checkoutUrl: string }>(
-        '/api/checkout',
-        {
-          priceId,
-        },
-      )
-
-      return data
-    },
-    {
-      onSuccess: (data) => {
-        window.location.href = data.checkoutUrl
-      },
     },
   )
 
@@ -214,10 +194,9 @@ const ProductPage: NextPage = () => {
           <p>{product.description}</p>
 
           <PurchaseButton
-            disabled={isCreatingCheckout}
-            onClick={() => mutateAsync(product.priceId)}
+            onClick={() => addItemToCart(product.id, product.priceId)}
           >
-            {isCreatingCheckout ? 'Carregando compra...' : 'Comprar agora'}
+            Comprar agora
           </PurchaseButton>
         </ProductDetails>
       </Container>

@@ -20,13 +20,14 @@ export default async function handler(
     },
   )
 
-  const product = checkoutSession.line_items?.data?.[0].price
-    ?.product as Stripe.Product
+  const products = checkoutSession.line_items?.data?.map((product) => ({
+    name: (product.price?.product as Stripe.Product).name,
+    coverUrl: (product.price?.product as Stripe.Product).images[0],
+  }))
 
   return res.json({
     id,
     customerName: checkoutSession.customer_details?.name,
-    productName: product?.name,
-    coverUrl: product.images[0],
+    products,
   })
 }

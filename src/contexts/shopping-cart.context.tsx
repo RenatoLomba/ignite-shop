@@ -19,6 +19,7 @@ type ShoppingCartContextData = {
   removeItemFromCart: (id: string) => void
   openShoppingCart: () => void
   closeShoppingCart: () => void
+  cleanShoppingCart: () => void
 }
 
 type ShoppingCartState = {
@@ -38,6 +39,7 @@ enum ShoppingCartReducerActions {
   REMOVE_ITEM_FROM_CART = 'REMOVE_ITEM_FROM_CART',
   OPEN_SHOPPING_CART = 'OPEN_SHOPPING_CART',
   CLOSE_SHOPPING_CART = 'CLOSE_SHOPPING_CART',
+  CLEAN_SHOPPING_CART = 'CLEAN_SHOPPING_CART',
 }
 
 type ShoppingCartReducerAction =
@@ -54,6 +56,9 @@ type ShoppingCartReducerAction =
     }
   | {
       type: ShoppingCartReducerActions.CLOSE_SHOPPING_CART
+    }
+  | {
+      type: ShoppingCartReducerActions.CLEAN_SHOPPING_CART
     }
 
 const shoppingCartReducer = (
@@ -95,6 +100,11 @@ const shoppingCartReducer = (
       return produce(state, (draft) => {
         draft.isShoppingCartModalOpen = false
       })
+    case ShoppingCartReducerActions.CLEAN_SHOPPING_CART:
+      return produce(state, (draft) => {
+        draft.items = []
+        draft.isShoppingCartModalOpen = false
+      })
     default:
       return state
   }
@@ -104,6 +114,17 @@ export function ShoppingCartProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(
     shoppingCartReducer,
     initialShoppingCartState,
+    () => {
+      const storedState = localStorage.getItem(
+        '@ignite-shop:shopping-cart:1.0.0',
+      )
+
+      if (storedState) {
+        return JSON.parse(storedState)
+      }
+
+      return initialShoppingCartState
+    },
   )
 
   const { items, isShoppingCartModalOpen } = state
@@ -130,6 +151,10 @@ export function ShoppingCartProvider({ children }: { children: ReactNode }) {
     dispatch({ type: ShoppingCartReducerActions.CLOSE_SHOPPING_CART })
   }
 
+  function cleanShoppingCart() {
+    dispatch({ type: ShoppingCartReducerActions.CLEAN_SHOPPING_CART })
+  }
+
   useEffect(() => {
     localStorage.setItem(
       '@ignite-shop:shopping-cart:1.0.0',
@@ -146,6 +171,7 @@ export function ShoppingCartProvider({ children }: { children: ReactNode }) {
         removeItemFromCart,
         closeShoppingCart,
         openShoppingCart,
+        cleanShoppingCart,
       }}
     >
       {children}

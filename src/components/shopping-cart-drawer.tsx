@@ -1,9 +1,11 @@
+import axios from 'axios'
 import Image from 'next/image'
 import { X } from 'phosphor-react'
 import { useMemo } from 'react'
 import Drawer from 'react-modern-drawer'
 
 import { css } from '@stitches/react'
+import { useMutation } from '@tanstack/react-query'
 
 import { useShoppingCart } from '../contexts'
 import { styled } from '../styles'
@@ -79,6 +81,28 @@ const ImgContainer = styled('div', {
   },
 })
 
+const BuyButton = styled('button', {
+  border: 'none',
+  background: '$green500',
+  color: '$white',
+  fontWeight: 'bold',
+  width: '100%',
+  padding: '1rem',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  transition: 'background 0.2s ease',
+  marginTop: '1.5rem',
+  borderRadius: 6,
+
+  '&:hover': {
+    background: '$green300',
+  },
+  '&:disabled': {
+    opacity: 0.6,
+  },
+})
+
 const SpacedBetweenContainer = styled('div', {
   width: '100%',
   display: 'flex',
@@ -91,6 +115,7 @@ export function ShoppingCartDrawer() {
     closeShoppingCart,
     items,
     removeItemFromCart,
+    cleanShoppingCart,
   } = useShoppingCart()
 
   const { data: products } = useProducts()
@@ -109,6 +134,27 @@ export function ShoppingCartDrawer() {
     acc += product.price
     return acc
   }, 0)
+
+  const { isLoading: isCreatingCheckout, mutateAsync: createCheckout } =
+    useMutation(
+      async () => {
+        const { data } = await axios.post<{ checkoutUrl: string }>(
+          '/api/checkout',
+          {
+            products: shoppingCartProducts,
+          },
+        )
+
+        return data
+      },
+      {
+        onSuccess: (data) => {
+          cleanShoppingCart()
+
+          window.location.href = data.checkoutUrl
+        },
+      },
+    )
 
   return (
     <Drawer
@@ -166,6 +212,13 @@ export function ShoppingCartDrawer() {
             }).format(total)}
           </strong>
         </SpacedBetweenContainer>
+
+        <BuyButton
+          disabled={isCreatingCheckout}
+          onClick={() => createCheckout()}
+        >
+          Finalizar compra
+        </BuyButton>
       </Container>
     </Drawer>
   )

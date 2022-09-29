@@ -11,7 +11,6 @@ import {
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 import { Header } from '../components'
-import { ShoppingCartProvider } from '../contexts'
 import { styled, globalStyles } from '../styles'
 
 import 'react-modern-drawer/dist/index.css'
@@ -34,6 +33,16 @@ const ShoppingCartDrawer = dynamic(
   () =>
     import('../components/shopping-cart-drawer').then(
       (module) => module.ShoppingCartDrawer,
+    ),
+  {
+    ssr: false,
+  },
+)
+
+const ShoppingCartProvider = dynamic(
+  () =>
+    import('../contexts/shopping-cart.context').then(
+      (module) => module.ShoppingCartProvider,
     ),
   {
     ssr: false,

@@ -12,22 +12,26 @@ export default async function handler(
     return res.status(400).json('Cannot GET to /checkout')
   }
 
-  const { priceId } = req.body
+  const { products } = req.body
 
-  if (!priceId) {
+  if (!products) {
     return res
       .status(400)
-      .json({ message: 'Price ID is required to create checkout session' })
+      .json({ message: 'Products are required to create checkout session' })
+  }
+
+  if (!Array.isArray(products)) {
+    return res
+      .status(400)
+      .json({ message: 'Products must be an array to create checkout session' })
   }
 
   const checkoutSession = await stripe.checkout.sessions.create({
     mode: 'payment',
-    line_items: [
-      {
-        price: priceId,
-        quantity: 1,
-      },
-    ],
+    line_items: products.map((product) => ({
+      quantity: 1,
+      price: product.priceId,
+    })),
     cancel_url: req.headers.referer || req.headers.host!, // who sent the request
     success_url: `${getUrl()}/success-purchase?session_id={CHECKOUT_SESSION_ID}`,
   })

@@ -1,33 +1,33 @@
+import axios from 'axios'
+
 import { useQuery } from '@tanstack/react-query'
 
-import { stripe } from './stripe'
-
-export const getProducts = async () => {
-  const products = await stripe.products.list({
-    expand: ['data.default_price'],
-  })
-
-  const productsWithPrice = products.data.map((product) => {
-    return {
-      id: product.id,
-      name: product.name,
-      coverUrl: product.images[0],
-      price:
-        typeof product.default_price !== 'string'
-          ? product.default_price!.unit_amount! / 100
-          : 0,
-      priceId:
-        typeof product.default_price !== 'string'
-          ? product.default_price!.id!
-          : '',
-    }
-  })
-
-  return productsWithPrice
+export type Product = {
+  id: string
+  name: string
+  coverUrl: string
+  price: number
+  priceId: string
 }
 
-export const useProducts = () => {
+const getUrl = () => {
+  if (typeof window !== 'undefined') return ''
+
+  if (typeof process.env.VERCEL_URL !== 'undefined')
+    return process.env.VERCEL_URL
+
+  return 'http://localhost:3000'
+}
+
+export const getProducts = async (): Promise<Product[]> => {
+  const { data } = await axios.get<Product[]>(getUrl() + '/api/products')
+
+  return data
+}
+
+export const useProducts = (initialData?: Product[]) => {
   return useQuery(['products'], getProducts, {
     staleTime: 1000 * 60 * 2, // 2 minutes
+    initialData,
   })
 }
