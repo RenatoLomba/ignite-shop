@@ -13,14 +13,17 @@ export type Product = {
 const getUrl = () => {
   if (typeof window !== 'undefined') return ''
 
-  if (typeof process.env.VERCEL_URL !== 'undefined')
-    return process.env.VERCEL_URL
+  if (process.env.VERCEL_URL) return process.env.VERCEL_URL
 
   return 'http://localhost:3000'
 }
 
 export const getProducts = async (): Promise<Product[]> => {
-  const { data } = await axios.get<Product[]>(getUrl() + '/api/products')
+  const url = getUrl()
+
+  const { data } = await axios.get<Product[]>(
+    url.endsWith('/') ? url + 'api/products' : url + '/api/products',
+  )
 
   return data
 }
