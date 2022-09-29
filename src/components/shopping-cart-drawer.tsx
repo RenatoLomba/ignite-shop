@@ -95,11 +95,12 @@ const BuyButton = styled('button', {
   marginTop: '1.5rem',
   borderRadius: 6,
 
-  '&:hover': {
+  '&:hover:not(:disabled)': {
     background: '$green300',
   },
   '&:disabled': {
     opacity: 0.6,
+    cursor: 'not-allowed',
   },
 })
 
@@ -214,7 +215,7 @@ export function ShoppingCartDrawer() {
         </SpacedBetweenContainer>
 
         <BuyButton
-          disabled={isCreatingCheckout}
+          disabled={isCreatingCheckout || shoppingCartProducts.length === 0}
           onClick={() => createCheckout()}
         >
           Finalizar compra
